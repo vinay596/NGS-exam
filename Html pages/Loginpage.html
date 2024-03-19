@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Page</title>
+    <script>
+        function myfunc(){
+        var a="vinay";
+        var b="vinay321";
+        var c=document.getElementById("a").value;
+        var d=document.getElementById("b").value;
+
+       
+        if(c==a && d==b){
+            // alert("Successfully Login");
+            window.location.href="Termspage.html";
+            alert("Successfully Login");
+        }
+        else{
+            alert("Invalid username and password");
+        }
+        }
+    
+
+    </script>
+</head>
+<body style="display: flex;justify-content: center;align-items: center;height: 100vh;">
+    <div style="border: 1px solid black; padding: 50px 25px">  
+    <form> 
+        <center> <b style="font-size: 20px;padding-bottom:30px;">Login</b></center>
+        <b style="padding-top: 50px;" placeholder="Username">Username</b><br/>
+        <input type="text" id="a"><br/><br/>
+        <b>Pass key</b><br/>
+        <input type="password" id="b">
+        <br>
+        <center><button onclick="myfunc()" style="margin-top: 20px;padding: 5px 20px;background-color: #4682B4;border: 2px solid #4682B4;color: white;">Login</button></center>
+    </form>
+</div>
+</body>
+</html>

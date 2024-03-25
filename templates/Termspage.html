@@ -12,13 +12,18 @@ function myfunction(){
     var b=document.getElementById("b");
 
     if(a.checked){
-     alert("activate start button")
-     b.style.backgroundColor="#4682B4"
-     
-  
+    
+     b.style.backgroundColor="#4682B4";
+    
 
     }
+
+    
 }
+function bt(){
+        window.location.href="AptitudeTest.html";
+     }
+
 </script>
 <body style="display: flex;justify-content: center;height: 100vh;align-items: center;">
     <div>
@@ -33,7 +38,7 @@ function myfunction(){
     <li>our desk/table must be clear or any materials except your test-taking device</li>
    </ul>
    <input id="a"  onclick="myfunction()" type="checkbox" style="margin-left: 25px;"><p style="margin-top: -20px;margin-left: 45px;">I accept above <a href="">terms </a>and <a href="">conditions</a></p>
-   <center><button id="b"  onclick="myfunname()" style="padding: 15px 50px; background-color: skyblue;margin-bottom: 30px;color: white;border: 2px solid #4682B4;">Start</button></center>
+   <center><button id="b"  onclick="bt()" style="padding: 15px 50px; background-color: skyblue;margin-bottom: 30px;color: white;border: 2px solid #4682B4;">Start</button></center>
 </div>
 </body>
 </html>

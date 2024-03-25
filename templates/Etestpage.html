@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dynamic Questionnaire with Timer</title>
+<style>
+  body {
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  display: flex;
+  justify-content: flex-end;
+  padding: 10px;
+  background-color:#4682B4;
+  margin-top: 0px;
+  position: relative;
+}
+
+
+.tab-container {
+  display: flex;
+  flex-grow: 1;
+  padding: 10px;
+}
+
+.tabs {
+  flex-direction: row;
+}
+
+.tab {
+  padding: 15px;
+  font-weight: bold;
+  cursor: pointer;
+  background-color: #f1f1f1;
+  border: none;
+  outline: none;
+  text-align: left;
+  margin-top: -10px;
+
+}
+
+.tab:hover {
+  background-color: #ddd;
+}
+
+.tab-content {
+  margin-left: 20px;
+  padding: 0px 10px;
+  display: none; 
+}
+
+.timer {
+  font-size: 20px;
+  font-weight: bold;
+  margin-right: 50px;
+  margin-top: 10px;
+  color: white;
+}
+
+
+.active-tab {
+  background-color: #ddd;
+}
+#questions{
+    position: relative;
+    position: absolute;
+    top: 200px;
+    left: 20px;
+}
+.button{
+  position: relative;
+  position: absolute;
+  top: 700px;
+  left: 700px;
+  
+}
+
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="timer" id="timer" style="padding-bottom: 8px;">30:00</div>
+  <button onclick="myfun()">SUBMIT</button>
+</div>
+<div class="button">
+  <button onclick="previousQuestion()" id="prevBtn" style="border:none;background-color: transparent;cursor: pointer;color: white;padding: 10px;margin-right: 40px;background-color: #4682B4;">PREVIOUS</button>
+  <button onclick="nextQuestion()" id="nextBtn" style="border:none;background-color: transparent;cursor: pointer;color: white;padding: 10px 30px;margin-right: 50px;background-color: #4682B4;">NEXT</button>
+</div>
+
+<div class="tab-container">
+  <div class="tabs" id="tabs">
+    <!-- JavaScript will generate tabs here -->
+  </div>
+
+  <div id="questions">
+    <!-- Flask inserts the first question here. The script below handles the rest. -->
+    {% if question %}
+    <div id="question1" class="tab-content" style="display:block;">
+        <h2>Question {{ question['id'] }}</h2>
+        <p>{{ question['question_text'] }}</p>
+        <ul>
+            <li>{{ question['option_a'] }}</li>
+            <li>{{ question['option_b'] }}</li>
+            <li>{{ question['option_c'] }}</li>
+            <li>{{ question['option_d'] }}</li>
+        </ul>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+<script>
+var currentQuestion = 1; 
+var totalQuestions = 30; 
+
+function showQuestion(questionNumber) {
+  var x = document.getElementsByClassName("tab-content");
+  for (var i = 0; i < x.length; i++) {
+    x[i].style.display = "none"; 
+  }
+  document.getElementById("question" + questionNumber).style.display = "block"; // Show the selected question
+  currentQuestion = questionNumber; // Update the current question
+  updateButtons(); // Update previous and next buttons
+}
+
+function previousQuestion() {
+  if (currentQuestion > 1) {
+    showQuestion(currentQuestion - 1);
+  }
+}
+
+function nextQuestion() {
+  if (currentQuestion < totalQuestions) {
+    showQuestion(currentQuestion + 1);
+  }
+}
+
+window.onload = function() {
+  var tabsContainer = document.getElementById('tabs');
+  var questionsContainer = document.getElementById('questions');
+
+  // Adjusted to start at 2 since the first question is already loaded
+  for (var i = 2; i <= totalQuestions; i++) {
+    var tab = document.createElement('button');
+    tab.className = 'tab';
+    tab.innerText = i;
+    tab.onclick = (function(i) {
+      return function() { showQuestion(i); };
+    })(i);
+    tabsContainer.appendChild(tab);
+
+    // Placeholder for additional questions
+    var question = document.createElement('div');
+    question.id = 'question' + i;
+    question.className = 'tab-content';
+    // This is where you'd dynamically insert more questions if they were loaded with the page
+    question.innerHTML = '<h2>Question ' + i + '</h2><p>Placeholder for question ' + i + '...</p>';
+    questionsContainer.appendChild(question);
+  }
+
+  showQuestion(1); // Show the first question
+
+  startTimer(30, document.getElementById('timer')); // Start the timer
+};
+
+function startTimer(duration, display) {
+  var timer = duration * 60, minutes, seconds;
+  var endInterval = setInterval(function () {
+    minutes = parseInt(timer / 60, 10);
+    seconds = parseInt(timer % 60, 10);
+
+    minutes = minutes < 10 ? "0" + minutes : minutes;
+    seconds = seconds < 10 ? "0" + seconds : seconds;
+
+    display.textContent = minutes + ":" + seconds;
+
+    if (--timer < 0) {
+      clearInterval(endInterval);
+      alert('Time is up!');
+    }
+  }, 1000);
+}
+
+function updateButtons() {
+  document.getElementById('prevBtn').disabled = (currentQuestion === 1);
+  document.getElementById('nextBtn').disabled = (currentQuestion === totalQuestions);
+}
+
+function myfun(){
+  window.location.href="codestart.html";
+}
+</script>
+</body>
+</html>

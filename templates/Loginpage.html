@@ -13,9 +13,9 @@
 
        
         if(c==a && d==b){
-            
-            window.location.href="Termspage.html";
-            alert("Successfully Login");
+            // alert("Successfully Login");
+            window.location.href="/terms-conditions";
+            alert("Successfully Login");    
         }
         else{
             alert("Invalid username and password");
@@ -25,17 +25,23 @@
 
     </script>
 </head>
-<body style="display: flex;justify-content: center;align-items: center;height: 100vh;">
-    <div style="border: 1px solid black; padding: 50px 25px">  
+<body>
+    <div class="container" style="width: 80%;margin: auto;">
+    <div class="main" style="display: flex;justify-content: space-around;">
+    <div class="div1" >
+        <img src="{{ url_for('static', filename='NGS.jpg') }}" alt="" width="700px" height="700px" style="margin-left: -80px;margin-top:-40px;">
+    </div>
+    <div class="div"  style="border: 1px solid black; padding: 50px 40px;box-shadow: 1px 1px 10px black;height: 220px;width:190px;margin-top: 150px;margin-right: 110px;">   
     <form> 
-        <center> <b style="font-size: 20px;padding-bottom:30px;">Login</b></center>
-        <b style="padding-top: 50px;" placeholder="Username">Username</b><br/>
-        <input type="text" id="a"><br/><br/>
+       <center> <b style="font-size: 25px;padding-bottom:30px;">Login</b><br></center><br>
+        <b style="margin-top: 60px;" placeholder="Username">Username</b><br/>
+        <input type="text" id="a" style="padding: 3px 15px;"><br/><br/>
         <b>Pass key</b><br/>
-        <input type="password" id="b">
+        <input type="password" id="b" style="padding: 3px 15px;">
         <br>
-        <center><button onclick="myfunc()" style="margin-top: 20px;padding: 5px 20px;background-color: #4682B4;border: 2px solid #4682B4;color: white;">Login</button></center>
+        <center><button onclick="myfunc()" style="margin-top: 20px;padding: 10px 25px;background-color: orange;border: 2px solid orange;color: white;">Login</button></center>
     </form>
+</div>
 </div>
 </body>
 </html>

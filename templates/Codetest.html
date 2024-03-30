@@ -45,24 +45,27 @@
 </head>
 <body style="margin: 0;padding: 0;box-sizing: border-box;">
     <div class="header">
-        <div class="timer" id="timer" style="padding-bottom: 0px;padding-right: 30px;font-size: 20px; color: white;">45:00</div>
-        <button style="margin-right: 20px;">Submit</button>
+        <div class="timer" id="timer">45:00</div>
+        <button style="margin-right: 20px;" onclick="f3()">End Test</button>
     </div> 
+    <div class="tabs" id="tabs">
+        <!-- Question number tabs will be dynamically generated here -->
+        {% for question in questions %}
+            <button class="tab" onclick="showQuestion({{ loop.index }})">Question {{ loop.index }}</button>
+        {% endfor %}
+    </div>
     <div class="tab-container">
         <div class="question-content">
-            {% if question %}
-            <div id="question1" class="tab-content" style="display:block;">
-                <h2>Question {{ question['id'] }}: {{ question['question_text'] }}</h2>
-                <ul>
-                    <li>A. {{ question['option_a'] }}</li>
-                    <li>B. {{ question['option_b'] }}</li>
-                    <li>C. {{ question['option_c'] }}</li>
-                    <li>D. {{ question['option_d'] }}</li>
-                </ul>
+            <!-- Dynamically display questions -->
+            {% for question in questions %}
+            <div id="question{{ loop.index }}" class="tab-content" style="{{ 'display: none;' if not loop.first else 'display: block;' }}">
+                <h2>Question {{ loop.index }}: {{ question.question_text }}</h2>
+                <p><strong>Problem Statement:</strong> {{ question.problem_statement }}</p>
+                <p><strong>Example Input:</strong> {{ question.example_input }}</p>
+                <p><strong>Example Output:</strong> {{ question.example_output }}</p>
             </div>
-            {% endif %}
+            {% endfor %}
         </div>
-
         <div class="code-editor-container" style="border:2px solid black;">
             <textarea id="code-editor"></textarea>
             <select id="language-selector" style="position: relative;position:absolute;top:43px;right:2px;padding: 10px 20px;background-color: black;color: white;">
@@ -78,8 +81,10 @@
         </div>
     </div>
     <div  style="margin-top: 10px;" class="code-output" id="code-output"></div>
+    </div>
+    <div class="code-output" id="code-output"></div>
     <script>
-        var editor = CodeMirror.fromTextArea(document.getElementById("code-editor"), {
+         var editor = CodeMirror.fromTextArea(document.getElementById("code-editor"), {
             mode: "text/x-csrc",
             lineNumbers: true
         });
@@ -110,40 +115,93 @@
   }, 1000);
 }
 
-window.onload=function(){
-    startTimer(45, document.getElementById('timer'));
-}
+        function showQuestion(questionNumber) {
+            // Hide all questions
+            var allQuestions = document.querySelectorAll('.tab-content');
+            allQuestions.forEach(function(question) {
+                question.style.display = 'none';
+            });
 
-        function executeCode() {
-            const code = editor.getValue();
-            const language = document.getElementById("language-selector").value;
-            const outputElement = document.getElementById("code-output");
+            // Show the selected question
+            document.getElementById('question' + questionNumber).style.display = 'block';
 
-            fetch('/execute', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ code: btoa(code), language }),
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.stdout) {
-                    outputElement.textContent = atob(data.stdout);
-                } else if (data.stderr) {
-                    outputElement.textContent = atob(data.stderr);
+            // Update tabs to indicate active question
+            var allTabs = document.querySelectorAll('.tab');
+            allTabs.forEach(function(tab, index) {
+                if (index === questionNumber - 1) {
+                    tab.classList.add('active-tab');
                 } else {
-                    outputElement.textContent = "No output.";
+                    tab.classList.remove('active-tab');
                 }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                outputElement.textContent = "Error executing code.";
             });
         }
-        function f1(){
-            window.location.href="Endpage.html";
+
+        window.onload=function(){
+    startTimer(45, document.getElementById('timer'));
+}
+function executeCode() {
+    const code = btoa(editor.getValue()); // Base64 encode the source code
+    const languageSelector = document.getElementById("language-selector");
+    let language_id = 71; // Default to Python
+    if (languageSelector.value === "c") {
+        language_id = 50; // Example ID for C
+    } else if (languageSelector.value === "c++") {
+        language_id = 54; // Example ID for C++
+    } // Add more conditions for other languages
+
+    const payload = {
+        source_code: code,
+        language_id: language_id,
+        stdin: "", // Add any input if required
+        redirect_stderr_to_stdout: true
+    };
+
+    fetch('http://localhost:2358/submissions?base64_encoded=true&wait=false', { // Note the `wait=false` parameter
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload)
+    })
+    .then(response => response.json())
+    .then(data => {
+        const token = data.token;
+        // Use the token to make another request to get the execution result
+        getResult(token);
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        document.getElementById("code-output").textContent = "Error submitting code.";
+    });
+}
+function getResult(token) {
+    fetch(`http://localhost:2358/submissions/${token}?base64_encoded=true`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
         }
+    })
+    .then(response => response.json())
+    .then(data => {
+        const outputElement = document.getElementById("code-output");
+        if (data.stdout) {
+            outputElement.textContent = atob(data.stdout); // Decode Base64 output
+        } else if (data.stderr) {
+            outputElement.textContent = atob(data.stderr); // Decode Base64 error
+        } else {
+            outputElement.textContent = "No output.";
+        }
+    })
+    .catch(error => {
+        console.error('Error fetching result:', error);
+        document.getElementById("code-output").textContent = "Error fetching result.";
+    });
+}
+
+
+function f3(){
+    window.location.href="/end";
+}
     </script>
 </body>
 </html>

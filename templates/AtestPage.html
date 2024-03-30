@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dynamic Questionnaire with Timer</title>
+<title>Aptitude test</title>
 <style>
   body {
   display: flex;
@@ -46,6 +46,10 @@
   background-color: #ddd;
 }
 
+.active-tab {
+  background-color: #00ff00; /* Green color */
+}
+
 .tab-content {
   margin-left: 20px;
   padding: 0px 10px;
@@ -60,16 +64,13 @@
   color: white;
 }
 
-
-.active-tab {
-  background-color: #ddd;
-}
 #questions{
     position: relative;
     position: absolute;
     top: 200px;
     left: 20px;
 }
+
 .button{
   position: relative;
   position: absolute;
@@ -95,23 +96,23 @@
   <div class="tabs" id="tabs">
     <!-- JavaScript will generate tabs here -->
   </div>
-
-  <div id="questions">
-    <!-- Flask inserts the first question here. The script below handles the rest. -->
-    {% if question %}
-    <div id="question1" class="tab-content" style="display:block;">
-        <h2>Question {{ question['id'] }}</h2>
-        <p>{{ question['question_text'] }}</p>
-        <ul>
-            <li>{{ question['option_a'] }}</li>
-            <li>{{ question['option_b'] }}</li>
-            <li>{{ question['option_c'] }}</li>
-            <li>{{ question['option_d'] }}</li>
+  <div id="questions" class="questions">
+    <!-- Flask-generated questions will dynamically populate here -->
+    {% for question in questions %}
+    <div id="question{{ loop.index }}" class="tab-content" style="{{ 'display: none;' if not loop.first else 'display: block;' }}">
+        <h2>Question {{ loop.index }}</h2>
+        <p>{{ question.question_text }}</p>
+        <ul style="list-style-type: none;">
+            <li><input type="radio" name="answer{{ loop.index }}" value="A" onclick="markAnswered()"> A. {{ question.option_a }}</li>
+            <li><input type="radio" name="answer{{ loop.index }}" value="B" onclick="markAnswered()"> B. {{ question.option_b }}</li>
+            <li><input type="radio" name="answer{{ loop.index }}" value="C" onclick="markAnswered()"> C. {{ question.option_c }}</li>
+            <li><input type="radio" name="answer{{ loop.index }}" value="D" onclick="markAnswered()"> D. {{ question.option_d }}</li>
         </ul>
     </div>
-    {% endif %}
+    {% endfor %}
   </div>
 </div>
+
 
 <script>
 var currentQuestion = 1; 
@@ -139,12 +140,17 @@ function nextQuestion() {
   }
 }
 
+function markAnswered() {
+  var tab = document.getElementById("tabs").children[currentQuestion - 1];
+  tab.classList.add("active-tab"); // Add the 'active-tab' class to mark the question as answered
+}
+
 window.onload = function() {
   var tabsContainer = document.getElementById('tabs');
   var questionsContainer = document.getElementById('questions');
 
-  // Adjusted to start at 2 since the first question is already loaded
-  for (var i = 2; i <= totalQuestions; i++) {
+  // Adjusted to start at 1
+  for (var i = 1; i <= totalQuestions; i++) {
     var tab = document.createElement('button');
     tab.className = 'tab';
     tab.innerText = i;
@@ -191,7 +197,7 @@ function updateButtons() {
 }
 
 function myfun(){
-  window.location.href="codestart.html";
+  window.location.href="/verbal-test-start";
 }
 </script>
 </body>

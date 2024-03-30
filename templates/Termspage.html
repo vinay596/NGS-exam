@@ -3,42 +3,108 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Instructions</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+            font-family: Arial, sans-serif;
+        }
+        
+        .container {
+            max-width: 600px;
+            width: 100%;
+            padding: 20px;
+            background-color: white;
+            box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
+            border-radius: 5px;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #4682B4;
+        }
+        
+        ul {
+            text-align: left;
+            font-size: large;
+            line-height: 30px;
+            list-style: inside;
+        }
+        
+        .terms {
+            display: flex;
+            align-items: center;
+            margin: 20px 0;
+        }
+        
+        #a {
+            margin-right: 10px;
+        }
+        
+        button {
+            width: 100%;
+            padding: 15px;
+            background-color: #4682B4;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        
+        button:disabled {
+            background-color: skyblue;
+            cursor: not-allowed;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                padding: 15px;
+            }
+            
+            ul {
+                font-size: medium;
+            }
+        }
+    </style>
 </head>
 
-<script>
-function myfunction(){
-    let a=document.getElementById("a");
-    var b=document.getElementById("b");
+<body>
+    <div class="container">
+       <h1>Instructions</h1>
+       <ul>
+            <li>You must use a functioning webcam and microphone.</li>
+            <li>No cell phones or other secondary devices in the room or test area.</li>
+            <li>No one else can be in the room with you.</li>
+            <li>The testing room must be well-lit, and you must be clearly visible.</li>
+            <li>Do not leave the camera.</li>
+            <li>No use of additional applications or internet.</li>
+            <li>Your desk/table must be clear of any materials except your test-taking device.</li>
+       </ul>
+       <div class="terms">
+           <input id="a" type="checkbox" onclick="myfunction()">
+           <label for="a">I accept the above <a href="">terms</a> and <a href="">conditions</a>.</label>
+       </div>
+       <button id="b" onclick="bt()" disabled>Start</button>
+    </div>
 
-    if(a.checked){
-    
-     b.style.backgroundColor="#4682B4";
-    
+    <script>
+        function myfunction() {
+            let checkbox = document.getElementById("a");
+            let button = document.getElementById("b");
 
-    }
+            button.disabled = !checkbox.checked;
+        }
 
-    
-}
-function bt(){
-        window.location.href="/aptitude-test-start";
-     }
-
-</script>
-<body style="display: flex;justify-content: center;height: 100vh;align-items: center;">
-    <div>
-   <h1 style="padding-left: 22px;">Instructions</h1>
-   <ul style="text-align: left; font-size: large;line-height: 30px;">
-    <li>You must use a functioning webcam and microphone</li>
-    <li>No cell phones or other secondary devices in the room or test area.</li>
-    <li>No one else can be in the room with you</li>
-    <li>he testing room must be well-lit and you must be clearly visible</li>
-    <li>Do not leave the camera </li>
-    <li>No use of additional applications or internet</li>
-    <li>our desk/table must be clear or any materials except your test-taking device</li>
-   </ul>
-   <input id="a"  onclick="myfunction()" type="checkbox" style="margin-left: 25px;"><p style="margin-top: -20px;margin-left: 45px;">I accept above <a href="">terms </a>and <a href="">conditions</a></p>
-   <center><button id="b"  onclick="bt()" style="padding: 15px 50px; background-color: skyblue;margin-bottom: 30px;color: white;border: 2px solid #4682B4;">Start</button></center>
-</div>
+        function bt() {
+            window.location.href = "/aptitude-test-start";
+        }
+    </script>
 </body>
 </html>

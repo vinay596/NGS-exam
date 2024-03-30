@@ -43,7 +43,7 @@ def coding_test_start():
 
 @app.route('/coding-test')
 def coding_test():
-    coding_questions = fetch_questions('coding')
+    coding_questions = fetch_questions('coding1')
     return render_template('Codetest.html', questions=coding_questions)
 
 @app.route('/submit-answer', methods=['POST'])
@@ -57,19 +57,28 @@ def submit_answer():
     return jsonify({"is_correct": is_correct, "total_marks": total_marks})
 
 @app.route('/execute', methods=['POST'])
-def execute_code():
+def compare_code():
     data = request.json
-    source_code = data['code']
+    question_id = data['question_id']
+    student_code = data['code']
     language = data['language']
-    language_id = {'python': 71, 'java': 62, 'c': 50, 'c++': 54}.get(language, 71)
-    payload = {
-        "source_code": source_code,
-        "language_id": language_id,
-        "stdin": "",
-        "redirect_stderr_to_stdout": True,
-    }
-    response = requests.post("https://api.judge0.com/submissions?base64_encoded=false&wait=true", json=payload)
-    return jsonify(response.json())
+    
+    # Fetch the correct solution from the database based on the question ID
+    db_connection = get_db_connection()
+    cursor = db_connection.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM questions WHERE id = %s", (question_id,))
+    question = cursor.fetchone()
+    db_connection.close()
+    
+    # Determine the solution column based on the selected language
+    solution_column = f"{language}_solution"
+    correct_solution = question.get(solution_column)
+    
+    # Compare the student's code with the correct solution
+    if student_code.strip() == correct_solution.strip():
+        return jsonify({"message": "Executed successfully", "is_correct": True})
+    else:
+        return jsonify({"message": "Error in execution", "is_correct": False})
 
 @app.route('/end')
 def end_page():

@@ -45,8 +45,8 @@
 </head>
 <body style="margin: 0;padding: 0;box-sizing: border-box;">
     <div class="header">
-        <div class="timer" id="timer">45:00</div>
-        <button style="margin-right: 20px;" onclick="f3()">End Test</button>
+        <div class="timer" id="timer" style="font-size: 25px;margin-right: 20px;color: white;">45:00</div>
+        <button style="margin-right: 20px;padding: 7px 20px;" onclick="f3()">End Test</button>
     </div> 
     <div class="tabs" id="tabs">
         <!-- Question number tabs will be dynamically generated here -->
@@ -68,7 +68,7 @@
         </div>
         <div class="code-editor-container" style="border:2px solid black;">
             <textarea id="code-editor"></textarea>
-            <select id="language-selector" style="position: relative;position:absolute;top:43px;right:2px;padding: 10px 20px;background-color: black;color: white;">
+            <select id="language-selector" style="position: relative;position:absolute;top:74px;right:1px;padding: 10px 20px;background-color: black;color: white;">
                 <option value="c">C</option>
                 <option value="c++">C++</option>
                 <option value="java">Java</option>
@@ -77,7 +77,7 @@
             </select>
             <button onclick="executeCode()" style="padding: 8px 18px;background-color: green;border: 2px solid green;color: white;">Run Code</button>
             
-            <button onclick="f1()" style="padding: 8px 22px;margin-left: 520px;position: relative;position: absolute;top: 348px;right: 2px;background-color: green;border: 2px solid green;color: white;">Submit</button>
+            <button onclick="f1()" style="padding: 8px 22px;margin-left: 520px;position: relative;position: absolute;top: 378px;right: 1px;background-color: green;border: 2px solid green;color: white;">Submit</button>
         </div>
     </div>
     <div  style="margin-top: 10px;" class="code-output" id="code-output"></div>
@@ -114,8 +114,9 @@
     }
   }, 1000);
 }
+let currentQuestionId = null;
 
-        function showQuestion(questionNumber) {
+        function showQuestion(questionNumber, questionId) {
             // Hide all questions
             var allQuestions = document.querySelectorAll('.tab-content');
             allQuestions.forEach(function(question) {
@@ -134,71 +135,34 @@
                     tab.classList.remove('active-tab');
                 }
             });
+            currentQuestionId = questionId; 
         }
 
         window.onload=function(){
     startTimer(45, document.getElementById('timer'));
 }
 function executeCode() {
-    const code = btoa(editor.getValue()); // Base64 encode the source code
-    const languageSelector = document.getElementById("language-selector");
-    let language_id = 71; // Default to Python
-    if (languageSelector.value === "c") {
-        language_id = 50; // Example ID for C
-    } else if (languageSelector.value === "c++") {
-        language_id = 54; // Example ID for C++
-    } // Add more conditions for other languages
-
-    const payload = {
-        source_code: code,
-        language_id: language_id,
-        stdin: "", // Add any input if required
-        redirect_stderr_to_stdout: true
-    };
-
-    fetch('http://localhost:2358/submissions?base64_encoded=true&wait=false', { // Note the `wait=false` parameter
+    const code = editor.getValue();
+    const language = document.getElementById("language-selector").value;
+    const outputElement = document.getElementById("code-output");
+    
+    // Use the global variable `currentQuestionId`
+    const questionId = currentQuestionId;
+    
+    fetch('/execute', {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload)
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ code, language, question_id: questionId })
     })
     .then(response => response.json())
     .then(data => {
-        const token = data.token;
-        // Use the token to make another request to get the execution result
-        getResult(token);
+        outputElement.textContent = data.message;
     })
     .catch(error => {
         console.error('Error:', error);
-        document.getElementById("code-output").textContent = "Error submitting code.";
+        outputElement.textContent = "Error submitting code.";
     });
 }
-function getResult(token) {
-    fetch(`http://localhost:2358/submissions/${token}?base64_encoded=true`, {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        const outputElement = document.getElementById("code-output");
-        if (data.stdout) {
-            outputElement.textContent = atob(data.stdout); // Decode Base64 output
-        } else if (data.stderr) {
-            outputElement.textContent = atob(data.stderr); // Decode Base64 error
-        } else {
-            outputElement.textContent = "No output.";
-        }
-    })
-    .catch(error => {
-        console.error('Error fetching result:', error);
-        document.getElementById("code-output").textContent = "Error fetching result.";
-    });
-}
-
-
 function f3(){
     window.location.href="/end";
 }
